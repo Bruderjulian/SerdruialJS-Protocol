@@ -1,0 +1,19 @@
+{
+  "name": "serdruialjs-protocol",
+  "version": "1.0.0",
+  "description": "The underlying Protocol for the SerdruialJS Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "protocol",
+    "serdruialjs"
+  ],
+  "author": "BruderJulian",
+  "license": "MIT",
+  "dependencies": {
+    "binary-parser-encoder": "^1.5.3",
+    "polycrc": "^1.1.1"
+  }
+}
