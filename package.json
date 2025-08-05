@@ -13,7 +13,10 @@
   "author": "BruderJulian",
   "license": "MIT",
   "dependencies": {
-    "binary-parser-encoder": "^1.5.3",
+    "binary-parser-encoder-bump": "^2.2.1",
     "polycrc": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0"
   }
 }
