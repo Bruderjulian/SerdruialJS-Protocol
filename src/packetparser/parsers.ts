@@ -1,5 +1,5 @@
 import { Parser } from "binary-parser-encoder-bump";
-import { STARTBYTE, ENDBYTE, indexedCommandMap } from "../constants.ts";
+import { STARTBYTE, ENDBYTE, indexedCommandMap } from "../utils/constants.js";
 
 Parser.start()
   .namely("cmd_init")

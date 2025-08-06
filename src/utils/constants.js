@@ -4,8 +4,8 @@ export const ENCRYPTION_ITERATIONS = 100000;
 export const ENCRYPTION_KEY_LENGTH = 32; // 256 bits
 export const ENCRYPTION_IV_LENGTH = 16; // 128 bits
 
-export const STARTBYTE = 0xAA;
-export const ENDBYTE = 0xEE;
+export const STARTBYTE = 0xaa;
+export const ENDBYTE = 0xee;
 export const DEFAULT_CRC = "crc16";
 export const CRC_SIZE = ENCRYPTION_KEY_LENGTH + ENCRYPTION_IV_LENGTH;
 
@@ -21,7 +21,37 @@ export const defaultOptions = {
   compressed: false,
 };
 
-export const defaultConfig = {};
+export const defaultConfig = {
+  board: "Arduino Uno",
+  port: "COM1",
+  baudRate: 9600,
+  autoOpen: true,
+  packetRetries: 3,
+  packetTimeout: 1000,
+  reconnect: {
+    enabled: true,
+    maxRetries: 5,
+    delay: 2000,
+  },
+  plugins: [],
+  protocolVersion: "1.0.0",
+  features: {
+    multiDevice: true,
+    streaming: true,
+  },
+  compression: {
+    enabled: true,
+  },
+  encryption: {
+    enabled: true,
+    key: "1234",
+    iterations: 100000,
+  },
+  checksum: {
+    enabled: true,
+    algorithm: "crc16",
+  },
+};
 
 export const commandMap = {
   init: { name: "cmd_init", id: 0x01 },

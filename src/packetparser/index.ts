@@ -7,7 +7,7 @@ import {
   STARTBYTE,
   ENDBYTE,
   indexedCommandMap,
-} from "../constants";
+} from "../utils/constants";
 import { createParser } from "./parsers";
 import {
   isObject,
@@ -18,7 +18,7 @@ import {
   defaults,
   getCrcId,
   getCrcImpl,
-} from "../utils";
+} from "../utils/utils";
 
 class PacketParser {
   #version: number;
@@ -51,7 +51,7 @@ class PacketParser {
       }
     });
 
-    return this.encode("init", {
+    return this.compose("init", {
       version: this.#version,
       crcId: this.#crcId / 8,
       deviceIdsAmount: deviceIds.length,
@@ -60,14 +60,14 @@ class PacketParser {
   }
 
   serialize(obj: Command): any {
-    return this.encode(obj.name, obj.data, obj.deviceId, obj.flags);
+    return this.compose(obj.name, obj.data, obj.deviceId, obj.flags);
   }
 
   deserialize(buffer: Buffer): Command {
     if (!Buffer.isBuffer(buffer)) {
       throw new TypeError("Buffer is required");
     }
-    const packet = this.decode(buffer);
+    const packet = this.decompose(buffer);
     const commandName = indexedCommandMap[packet.command];
     if (!commandName) {
       throw new Error(`Unknown command ID: ${packet.command}`);
@@ -86,7 +86,7 @@ class PacketParser {
     };
   }
 
-  encode(
+  compose(
     command: string,
     data?: PacketData,
     deviceId?: number,
@@ -111,7 +111,7 @@ class PacketParser {
     return this.#postEncode(this.#parser.encode(packet));
   }
 
-  decode(buffer: Buffer): Packet {
+  decompose(buffer: Buffer): Packet {
     if (!Buffer.isBuffer(buffer)) {
       throw new TypeError("Buffer is required");
     }

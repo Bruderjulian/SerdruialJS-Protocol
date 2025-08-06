@@ -42,20 +42,48 @@ function validVersion(version) {
   );
 }
 
-function defaults(opts = {}, defaultOpts = {}) {
-  if (!isObject(opts)) {
-    throw new TypeError("Options must be an object");
-  }
-  const outOpts = {};
-  for (const key of Object.keys(defaultOpts)) {
-    if (!hasOwn(opts, key)) {
-      outOpts[key] = defaultOpts[key];
-    } else {
-      outOpts[key] = opts[key];
-    }
-  }
-  return outOpts;
+const disallowedKeys = new Set([
+	'__proto__',
+	'prototype',
+	'constructor',
+]);
+
+const merge = (destination, source) => {
+	if (!isObject(source)) {
+		return destination;
+	}
+
+	if (!destination) {
+		destination = {};
+	}
+
+	for (const [sourceKey, sourceValue] of Object.entries(source)) {
+		if (disallowedKeys.has(sourceKey)) {
+			continue;
+		}
+
+		const destinationValue = destination[sourceKey];
+
+		if (isPlainObject(destinationValue) && isPlainObject(sourceValue)) {
+			destination[sourceKey] = merge(destinationValue, sourceValue); // Merge plain objects recursively
+		} else if (sourceValue === undefined) {
+			continue; // Skip undefined values in source
+		} else if (isPlainObject(sourceValue)) {
+			destination[sourceKey] = merge({}, sourceValue); // Clone plain objects
+		} else if (Array.isArray(sourceValue)) {
+			destination[sourceKey] = [...sourceValue]; // Clone arrays
+		} else {
+			destination[sourceKey] = sourceValue; // Assign other types
+		}
+	}
+
+	return destination;
+};
+
+function defaults(options = {}, defaultOptions = {}) {
+	return merge(structuredClone(defaultOptions), structuredClone(options));
 }
+
 
 const isArray =
   Array.isArray ||
