@@ -3,20 +3,13 @@ module.exports = {
   version: "1.0.0",
   description: "A Test Plugin",
   author: "BruderJulian",
-  license: "MIT",
   dependencies: [],
-  priority: 1,
+  optionalDependencies: [],
 
   load: () => {
 
   },
   unload: () => {
 
-  },
-  install: () => {
-
-  },
-  uninstall: () => {
-
-  },
+  }
 };
