@@ -1,5 +1,4 @@
 import  {Config} from "./Config.js";
-import {PluginManager} from "./Plugins.js";
 
 Config.load({
   board: "Arduino Uno",

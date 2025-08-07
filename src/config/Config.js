@@ -36,11 +36,11 @@ export class Config {
   static async #loadFromFile(path) {
     try {
       if (path.endsWith(".js")) {
-        const { Config } = await import(`file://${path}`);
-        if (!Config || !isObject(Config)) {
-          throw new LoadError("Failed to load config from JS file");
+        const { config } = await import(`file://${path}`);
+        if (!config || !isObject(config)) {
+          throw new LoadError("Failed to load config from JS file: " + path);
         }
-        return Config;
+        return config;
       }
       if (!path.endsWith(".json")) {
         throw new TypeError("Config file must be a JSON or JS file");

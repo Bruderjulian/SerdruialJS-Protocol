@@ -20,7 +20,7 @@ import {
   getCrcImpl,
 } from "../utils/utils";
 
-class PacketParser {
+export default class PacketParser {
   #version: number;
   #crcId: number;
   #crcImpl: Function;
@@ -154,5 +154,3 @@ class PacketParser {
     return buffer;
   }
 }
-
-export { PacketParser, PROTOCOL_VERSIONS };
