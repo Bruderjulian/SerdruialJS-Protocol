@@ -9,6 +9,8 @@ export const ENDBYTE = 0xee;
 export const DEFAULT_CRC = "crc16";
 export const CRC_SIZE = ENCRYPTION_KEY_LENGTH + ENCRYPTION_IV_LENGTH;
 
+export const exitEvents = ["exit", "SIGINT", "SIGTERM", "SIGQUIT"];
+
 export const PROTOCOL_VERSIONS = {
   V1: 1,
   LATEST: 1,

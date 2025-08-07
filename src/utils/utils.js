@@ -42,48 +42,79 @@ function validVersion(version) {
   );
 }
 
-const disallowedKeys = new Set([
-	'__proto__',
-	'prototype',
-	'constructor',
-]);
+const disallowedKeys = new Set(["__proto__", "prototype", "constructor"]);
 
 const merge = (destination, source) => {
-	if (!isObject(source)) {
-		return destination;
-	}
+  if (!isObject(source)) {
+    return destination;
+  }
 
-	if (!destination) {
-		destination = {};
-	}
+  if (!destination) {
+    destination = {};
+  }
 
-	for (const [sourceKey, sourceValue] of Object.entries(source)) {
-		if (disallowedKeys.has(sourceKey)) {
-			continue;
-		}
+  for (const [sourceKey, sourceValue] of Object.entries(source)) {
+    if (disallowedKeys.has(sourceKey)) {
+      continue;
+    }
 
-		const destinationValue = destination[sourceKey];
+    const destinationValue = destination[sourceKey];
 
-		if (isPlainObject(destinationValue) && isPlainObject(sourceValue)) {
-			destination[sourceKey] = merge(destinationValue, sourceValue); // Merge plain objects recursively
-		} else if (sourceValue === undefined) {
-			continue; // Skip undefined values in source
-		} else if (isPlainObject(sourceValue)) {
-			destination[sourceKey] = merge({}, sourceValue); // Clone plain objects
-		} else if (Array.isArray(sourceValue)) {
-			destination[sourceKey] = [...sourceValue]; // Clone arrays
-		} else {
-			destination[sourceKey] = sourceValue; // Assign other types
-		}
-	}
+    if (isObject(destinationValue) && isObject(sourceValue)) {
+      destination[sourceKey] = merge(destinationValue, sourceValue); // Merge plain objects recursively
+    } else if (sourceValue === undefined) {
+      continue; // Skip undefined values in source
+    } else if (isObject(sourceValue)) {
+      destination[sourceKey] = merge({}, sourceValue); // Clone plain objects
+    } else if (Array.isArray(sourceValue)) {
+      destination[sourceKey] = [...sourceValue]; // Clone arrays
+    } else {
+      destination[sourceKey] = sourceValue; // Assign other types
+    }
+  }
 
-	return destination;
+  return destination;
 };
 
 function defaults(options = {}, defaultOptions = {}) {
-	return merge(structuredClone(defaultOptions), structuredClone(options));
+  return merge(structuredClone(defaultOptions), structuredClone(options));
+}
+const mimeMap = {
+  json: "application/json",
+  text: "text/plain",
+};
+async function fetchGet(url, type) {
+  let retryLeft = 3;
+  while (retryLeft > 0) {
+    try {
+      let result = await fetch(url, {
+        method: "GET",
+        header: {
+          "content-type": mimeMap[type],
+          accept: mimeMap[type],
+        },
+        redirect: "follow",
+      });
+      if (!result.ok || result.status !== 200) {
+        throw "";
+      }
+      if (type === "json") {
+        return await result.json();
+      } else if (type === "text") {
+        return await result.text();
+      }
+    } catch (err) {
+      await sleep(200);
+    } finally {
+      retryLeft -= 1;
+    }
+  }
+  throw new Error("Failed to fetch from: " + url);
 }
 
+function sleep(delay) {
+  return new Promise((resolve) => setTimeout(resolve, delay));
+}
 
 const isArray =
   Array.isArray ||
@@ -93,6 +124,18 @@ const isArray =
 
 function isObject(obj) {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+}
+
+function isFunction(v) {
+  return typeof v === "function";
+}
+
+function isDefined(v) {
+  return typeof v !== "undefined" && v !== null;
+}
+
+function isString(v) {
+  return typeof v === "string";
 }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -110,5 +153,8 @@ export {
   defaults,
   isArray,
   isObject,
+  isDefined,
+  isFunction,
   hasOwn,
+  fetchGet,
 };
