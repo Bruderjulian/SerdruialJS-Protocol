@@ -1,5 +1,5 @@
 import polycrc from "polycrc";
-import { PROTOCOL_VERSIONS } from "./constants.js";
+import { baudRates, PROTOCOL_VERSIONS } from "./constants.js";
 
 function getCrcImpl(id) {
   const crcImpl = polycrc["crc" + id];
@@ -116,6 +116,19 @@ function sleep(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
+function validBaudRate(rate) {
+  return baudRates.hasOwnProperty("$" + rate);
+}
+
+function validPort(str) {
+  var regex = /^(\/(dev\/[a-zA-Z0-9]+)|com[0-9]+)$/;
+  return (
+    (typeof str === "string" && regex.test(str)) ||
+    str === "" ||
+    str === undefined
+  );
+}
+
 const isArray =
   Array.isArray ||
   function (a) {
@@ -157,4 +170,6 @@ export {
   isFunction,
   hasOwn,
   fetchGet,
+  validBaudRate,
+  validPort
 };

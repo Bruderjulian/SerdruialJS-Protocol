@@ -1,5 +1,11 @@
 import { copyFile, readFile, writeFile } from "fs/promises";
-import { defaults, isObject, isArray } from "../utils.js";
+import {
+  defaults,
+  isObject,
+  isArray,
+  validBaudRate,
+  validPort,
+} from "../utils/utils.js";
 import { defaultConfig } from "../constants.js";
 import { existsSync } from "fs";
 import { join } from "path";
@@ -102,10 +108,10 @@ export class Config {
     if (typeof config.board !== "string") {
       throw new TypeError("Invalid Board Option");
     }
-    if (typeof config.port !== "string") {
+    if (!validPort(config.port)) {
       throw new TypeError("Invalid Port Option");
     }
-    if (typeof config.baudRate !== "number" || config.baudRate <= 0) {
+    if (validBaudRate(config.baudRate)) {
       throw new TypeError("Invalid Baud Rate Option");
     }
     if (typeof config.autoOpen !== "boolean") {
@@ -114,7 +120,11 @@ export class Config {
     if (typeof config.packetRetries !== "number" || config.packetRetries < 0) {
       throw new TypeError("Invalid Packet Retries Option");
     }
-    if (typeof config.packetTimeout !== "number" || config.packetTimeout < 0) {
+    if (
+      typeof config.packetTimeout !== "number" ||
+      config.packetTimeout < 0 ||
+      config.packetTimeout > 10000
+    ) {
       throw new TypeError("Invalid Packet Timeout Option");
     }
     if (typeof config.protocolVersion !== "string") {
@@ -161,7 +171,10 @@ export class Config {
     if (
       typeof config.reconnect.enabled !== "boolean" ||
       !Number.isInteger(config.reconnect.delay) ||
-      !Number.isInteger(config.reconnect.retries)
+      config.reconnect.delay < 0 ||
+      config.reconnect.delay > 10000 ||
+      !Number.isInteger(config.reconnect.retries) ||
+      config.reconnect.retries < 0
     ) {
       throw new TypeError("Invalid Reconnect Options");
     }
@@ -171,8 +184,8 @@ export class Config {
     if (
       typeof config.encryption.enabled !== "boolean" ||
       !Number.isInteger(config.encryption.interations) ||
-      (config.encryption.enabled &&
-        typeof config.checksum.algorithm !== "string")
+      config.encryption.interations < 0 ||
+      (config.encryption.enabled && typeof config.checksum.key !== "string")
     ) {
       throw new TypeError("Invalid Encryption Options");
     }
