@@ -36,10 +36,6 @@ export default class BoardData {
       return new BoardData(id, name, version, pins, spec);
   }
   
-  static find() {
-      
-  }
-  
 
   static parsePins() {
     
