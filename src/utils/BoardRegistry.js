@@ -55,6 +55,14 @@ export class BoardRegistry {
   list() {
     return this.ids;
   }
+  
+  find(id) {
+    let data = get(id);
+    if (data) return data;
+    data = get(id.toLowerCase());
+    if (data) return data;
+    return null;
+  }
 
   #update() {
     this.ids = Object.keys(boards);
