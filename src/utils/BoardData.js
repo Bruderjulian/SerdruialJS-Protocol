@@ -4,9 +4,10 @@ export default class BoardData {
   name;
   pins;
   spec;
-  constructor(id, name, pins, spec = {}) {
+  constructor(id, name, version, pins, spec = {}) {
     this.id = id;
     this.name = name;
+    this.version = version;
     this.pins = parsePins(pins);
     this.spec = spec;
   }
