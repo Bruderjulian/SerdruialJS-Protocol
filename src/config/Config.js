@@ -15,28 +15,30 @@ import { PluginManager } from "./Plugins.js";
 export class Config {
   static #path = "serdruial.config.js";
   static #config = {};
-  static isLoad = false;
+  static isLoaded = false;
 
   constructor() {}
 
   static createDefault() {
     if (!existsSync(this.getPath())) {
-      console.log("Creating default config file at", this.getPath());
+      console.log("Creating default Config at", this.getPath());
       copyFile(__dirname + "/serdruial.config.js", this.getPath());
     }
   }
 
   static async load(config) {
     if (typeof config === "string" && config.length > 0) {
-      config = this.#loadFromFile(config);
+      config = await this.#loadFromFile(config);
     } else if (typeof config === "undefined") {
       config = await this.#loadFromFile(this.getPath());
     }
     if (!isObject(config)) {
       throw new Error("Config must be an object");
     }
+    config = defaults(config, defaultConfig);
+
     this.#config = this.#validate(config);
-    this.isLoad = true;
+    this.isLoaded = true;
   }
 
   static async #loadFromFile(path) {
@@ -66,14 +68,7 @@ export class Config {
   static async save(config) {
     config = defaults(config, defaultConfig);
     try {
-      writeFile(
-        this.getPath(),
-        `import {Config} from "serdruialjs";\n\nConfig.load(${JSON.stringify(
-          config,
-          null,
-          2
-        )})`
-      );
+      writeFile(this.getPath(), JSON.stringify(config, null, 2));
     } catch (err) {
       throw new Error(`Failed to save config: ${err.message}`);
     }
@@ -100,11 +95,10 @@ export class Config {
   }
 
   static hasPlugin(id) {
-    PluginManager.isLoaded(id);
+    PluginManager.hasPlugin(id);
   }
 
   static #validate(config) {
-    config = defaults(config, defaultConfig);
     if (typeof config.board !== "string") {
       throw new TypeError("Invalid Board Option");
     }

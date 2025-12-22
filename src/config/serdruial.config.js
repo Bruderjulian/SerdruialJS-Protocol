@@ -1,31 +1,25 @@
 import  {Config} from "./Config.js";
 
-Config.load({
+await Config.load({
   board: "Arduino Uno",
   port: "COM1",
   baudRate: 9600,
   autoOpen: true,
 
-  protocolVersion: "1.0.0",
   features: {
     multiDevice: true,
-    streaming: true,
+    streaming: false,
   },
-  plugins: [""],
+  plugins: [],
 
-  packetRetries: 3,
-  packetTimeout: 1000,
   reconnect: {
     enabled: true,
-    maxRetries: 5,
-    delay: 2000,
   },
-
   compression: {
-    enabled: true,
+    enabled: false,
   },
   encryption: {
-    enabled: true,
+    enabled: false,
     key: "1234",
     iterations: 100000,
   },
@@ -33,5 +27,4 @@ Config.load({
     enabled: true,
     algorithm: "crc16",
   }
-
 });

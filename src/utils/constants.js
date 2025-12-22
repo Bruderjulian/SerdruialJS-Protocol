@@ -24,8 +24,6 @@ export const defaultOptions = {
 };
 
 export const defaultConfig = {
-  board: "Arduino Uno",
-  port: "COM1",
   baudRate: 9600,
   autoOpen: true,
   packetRetries: 3,
