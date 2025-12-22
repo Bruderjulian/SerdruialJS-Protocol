@@ -79,42 +79,6 @@ const merge = (destination, source) => {
 function defaults(options = {}, defaultOptions = {}) {
   return merge(structuredClone(defaultOptions), structuredClone(options));
 }
-const mimeMap = {
-  json: "application/json",
-  text: "text/plain",
-};
-async function fetchGet(url, type) {
-  let retryLeft = 3;
-  while (retryLeft > 0) {
-    try {
-      let result = await fetch(url, {
-        method: "GET",
-        header: {
-          "content-type": mimeMap[type],
-          accept: mimeMap[type],
-        },
-        redirect: "follow",
-      });
-      if (!result.ok || result.status !== 200) {
-        throw "";
-      }
-      if (type === "json") {
-        return await result.json();
-      } else if (type === "text") {
-        return await result.text();
-      }
-    } catch (err) {
-      await sleep(200);
-    } finally {
-      retryLeft -= 1;
-    }
-  }
-  throw new Error("Failed to fetch from: " + url);
-}
-
-function sleep(delay) {
-  return new Promise((resolve) => setTimeout(resolve, delay));
-}
 
 function validBaudRate(rate) {
   return baudRates.hasOwnProperty("$" + rate);
@@ -147,10 +111,6 @@ function isDefined(v) {
   return typeof v !== "undefined" && v !== null;
 }
 
-function isString(v) {
-  return typeof v === "string";
-}
-
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasOwn =
   Object.hasOwn ||
@@ -169,7 +129,6 @@ export {
   isDefined,
   isFunction,
   hasOwn,
-  fetchGet,
   validBaudRate,
   validPort
 };
