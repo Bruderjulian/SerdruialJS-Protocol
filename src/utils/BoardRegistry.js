@@ -1,4 +1,4 @@
-import BoardData from "./BoardData.js";
+import {BoardData} from "./BoardData.js";
 import {hasOwn} from "./utils.js";
 
 export const boards = {};
