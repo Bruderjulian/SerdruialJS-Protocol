@@ -1,12 +1,15 @@
-import { isObject } from "./utils.js";
+import { hasOwn, isArray, isDefined, isObject } from "./utils.js";
 
-export type BoardPins = {};
+export type BoardPin = {
+  id: string;
+  type: PinType;
+};
 export type BoardDataOptions = {
   id: string;
   name?: string;
   version: string;
-  pins: string;
-  spec: BoardSpec;
+  pins: BoardPin[];
+  spec?: BoardSpec;
 };
 export type BoardSpec = {};
 
@@ -14,15 +17,15 @@ export class BoardData {
   id: string;
   name: string;
   version: string;
-  pins: any;
-  spec: BoardSpec;
+  pins: BoardPin[];
+  spec?: BoardSpec;
 
   constructor(
     id: string,
     name: string,
     version: string = "1.0",
-    pins: string,
-    spec: BoardSpec = {}
+    pins: BoardPin[],
+    spec?: BoardSpec
   ) {
     if (typeof id !== "string" || typeof name !== "string") {
       throw new TypeError("Invalid Name or Id for Board");
@@ -30,16 +33,16 @@ export class BoardData {
     if (typeof version !== "string") {
       throw new TypeError("Invalid Version for Board " + id);
     }
-    if (typeof pins !== "string") {
+    if (!isArray(pins) || pins.some(pin => BoardData.#isValidPin(pin))) {
       throw new TypeError("Invalid Pins for Board " + id);
     }
-    if (!isObject(spec)) {
+    if (isDefined(spec) && !isObject(spec)) {
       throw new TypeError("Invalid Spec for Board " + id);
     }
     this.id = id;
     this.name = name;
     this.version = version;
-    this.pins = BoardData.parsePins(pins);
+    this.pins = pins;
     this.spec = spec;
   }
 
@@ -56,43 +59,39 @@ export class BoardData {
     );
   }
 
-  static parsePins(pinsStr: string): any {
-    return null;
-  }
-}
-
-export class BoardPin {
-  type: PinType | undefined;
-  id: string;
-
-  constructor(str: string) {
-    if (typeof str !== "string" || str.length == 0) {
-      throw new TypeError("Invalid Pin for Board");
-    }
-    this.id = str;
-    this.type = PinType.from(str);
+  static #isValidPin(pin: BoardPin): any {
+    return isObject(pin) && hasOwn(pin, "id")  && hasOwn(pin, "type") && typeof pin.id === "string" && pin.type instanceof PinType;
   }
 }
 
 export class PinType {
   static DIGITAL = new PinType("D", "digital");
   static ANALOG = new PinType("A", "analog");
+  static PWM = new PinType(["~D"], "pwm");
+  static POWER = new PinType(["VIN", "GND", "GROUND", "3.3V", "3V3", "5V"], "power");
+  static SERIAL = new PinType(["TX", "RX", "UART", "SPI", "I2C"], "power");
 
-  letter: string;
+  letters: string[];
   name: string;
-  constructor(letter: string, name: string) {
-    this.letter = letter.toUpperCase();
+  constructor(letter: string | string[], name: string) {
+    if (typeof letter === "string") {
+      letter = [letter];
+    }
+    this.letters = letter;
     this.name = name;
   }
 
   static modes() {
-    return [this.DIGITAL, this.ANALOG];
+    return [this.DIGITAL, this.ANALOG, this.PWM, this.POWER];
   }
 
   static from(str: string): PinType | undefined {
+    str = str.toUpperCase();
     for (const type of this.modes()) {
-      if (str.startsWith(type.letter)) {
-        return type;
+      for (let i = 0; i < type.letters.length; i++) {
+        if (str.startsWith(type.letters[i])) {
+          return type;
+        }
       }
     }
   }
