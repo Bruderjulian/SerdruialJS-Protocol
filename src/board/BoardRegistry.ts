@@ -1,5 +1,5 @@
-import {BoardData} from "./BoardData.js";
-import {hasOwn} from "./utils.js";
+import {BoardData} from "./BoardData.ts";
+import {hasOwn} from "../utils/utils.js";
 
 export class BoardRegistry {
   static count: number = 0;
