@@ -1,7 +1,7 @@
 import polycrc from "polycrc";
 import { baudRates, PROTOCOL_VERSIONS } from "./constants.js";
 
-function getCrcImpl(id) {
+function getCrcImpl(id: string) {
   const crcImpl = polycrc["crc" + id];
   if (!(crcImpl instanceof polycrc.CRC || typeof crcImpl === "function")) {
     throw new TypeError("Invalid CRC Id");
@@ -9,7 +9,7 @@ function getCrcImpl(id) {
   return crcImpl;
 }
 
-function getCrcId(id) {
+function getCrcId(id: string) {
   if (typeof id !== "string" || !id.startsWith("crc")) {
     throw new TypeError("Invalid CRC Id");
   }
@@ -24,7 +24,7 @@ function getCrcId(id) {
   }
   return parser_id;
 }
-function validByte(value, defaultValue) {
+function validByte(value: string | number, defaultValue: number) {
   value = parseInt(value.toString(), 10);
   if (typeof value !== "number" || value < 0 || value > 255 || isNaN(value)) {
     return defaultValue || 0;
@@ -32,7 +32,7 @@ function validByte(value, defaultValue) {
   return value;
 }
 
-function validVersion(version) {
+function validVersion(version: string | number) {
   version = parseInt(version.toString(), 10);
   return (
     typeof version === "number" &&
@@ -44,7 +44,10 @@ function validVersion(version) {
 
 const disallowedKeys = new Set(["__proto__", "prototype", "constructor"]);
 
-const merge = (destination, source) => {
+const merge = (
+  destination: Record<string, any>,
+  source: Record<string, any>
+) => {
   if (!isObject(source)) {
     return destination;
   }
@@ -80,11 +83,11 @@ function defaults(options = {}, defaultOptions = {}) {
   return merge(structuredClone(defaultOptions), structuredClone(options));
 }
 
-function validBaudRate(rate) {
+function validBaudRate(rate: string | number) {
   return baudRates.hasOwnProperty("$" + rate);
 }
 
-function validPort(str) {
+function validPort(str: string) {
   var regex = /^(\/(dev\/[a-zA-Z0-9]+)|com[0-9]+)$/;
   return (
     (typeof str === "string" && regex.test(str)) ||
@@ -95,26 +98,26 @@ function validPort(str) {
 
 const isArray =
   Array.isArray ||
-  function (a) {
+  function (a: any): a is any[] {
     return a && a.constructor === Array;
   };
 
-function isObject(obj) {
+function isObject(obj: any): obj is Record<string, any> {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
 }
 
-function isFunction(v) {
+function isFunction(v: any): v is Function {
   return typeof v === "function";
 }
 
-function isDefined(v) {
+function isDefined<T>(v?: T): v is NonNullable<T> {
   return typeof v !== "undefined" && v !== null;
 }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 const hasOwn =
   Object.hasOwn ||
-  function (obj, prop) {
+  function (obj: Record<string, any>, prop: string): boolean {
     return hasOwnProperty.call(obj, prop);
   };
 
