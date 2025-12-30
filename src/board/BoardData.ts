@@ -1,44 +1,38 @@
 import { isDefined, isObject } from "../utils/utils.ts";
-import { PinLayout } from "./PinLayout.ts";
+import PinLayout from "./PinLayout.ts";
+import { FQBN } from "./fqbn.ts";
 
 export type BoardDataOptions = {
-  id: string;
-  name?: string;
-  version: string;
+  fqbn: FQBN;
   pins: PinLayout;
+  name?: string;
   spec?: BoardSpec;
 };
 export type BoardSpec = {};
 
-export class BoardData {
+export default class BoardData {
   id: string;
   name: string;
-  version: string;
+  fqbn: FQBN;
   pins: PinLayout;
   spec?: BoardSpec;
 
-  constructor(
-    id: string,
-    name: string,
-    version: string = "1.0",
-    pins: PinLayout,
-    spec?: BoardSpec
-  ) {
-    if (typeof id !== "string" || typeof name !== "string") {
-      throw new TypeError("Invalid Name or Id for Board");
+  constructor(fqbn: FQBN, pins: PinLayout, name: string, spec?: BoardSpec) {
+    if (!(fqbn instanceof FQBN)) {
+      throw new TypeError("Invalid FQBN for Board");
     }
-    if (typeof version !== "string") {
-      throw new TypeError("Invalid Version for Board " + id);
+    this.id = fqbn.boardId;
+    if (typeof name !== "string") {
+      throw new TypeError("Invalid Name for Board " + this.id);
     }
     if (!(pins instanceof PinLayout)) {
-      throw new TypeError("Invalid PinLayout for Board " + id);
+      throw new TypeError("Invalid PinLayout for Board " + this.id);
     }
     if (isDefined(spec) && !isObject(spec)) {
-      throw new TypeError("Invalid Spec for Board " + id);
+      throw new TypeError("Invalid Spec for Board " + this.id);
     }
-    this.id = id;
+    this.fqbn = fqbn;
     this.name = name;
-    this.version = version;
     this.pins = pins;
     this.spec = spec;
   }
@@ -48,47 +42,50 @@ export class BoardData {
       throw new TypeError("Invalid BoardData Object");
     }
     return new BoardData(
-      opts.id,
-      typeof opts.name !== "string" ? opts.id : opts.name,
-      opts.version,
+      opts.fqbn,
       opts.pins,
+      typeof opts.name !== "string" ? opts.fqbn.boardId : opts.name,
       opts.spec
     );
   }
-}
 
-export class PinType {
-  static DIGITAL = new PinType("D", "digital");
-  static ANALOG = new PinType("A", "analog");
-  static PWM = new PinType(["~D"], "pwm");
-  static POWER = new PinType(
-    ["VIN", "GND", "GROUND", "3.3V", "3V3", "5V"],
-    "power"
-  );
-  static SERIAL = new PinType(["TX", "RX", "UART", "SPI", "I2C"], "power");
-
-  letters: string[];
-  name: string;
-  constructor(letter: string | string[], name: string) {
-    if (typeof letter === "string") {
-      letter = [letter];
-    }
-    this.letters = letter;
-    this.name = name;
+  getId() {
+    return this.fqbn.boardId;
   }
 
-  static modes() {
-    return [this.DIGITAL, this.ANALOG, this.PWM, this.POWER];
+  getFQBN() {
+    return this.fqbn;
   }
 
-  static from(str: string): PinType | undefined {
-    str = str.toUpperCase();
-    for (const type of this.modes()) {
-      for (let i = 0; i < type.letters.length; i++) {
-        if (str.startsWith(type.letters[i])) {
-          return type;
-        }
-      }
-    }
+  getName() {
+    return this.name;
+  }
+
+  getVendor() {
+    return this.fqbn.vendor;
+  }
+
+  getArch() {
+    return this.fqbn.arch;
+  }
+
+  getPins() {
+    return this.pins;
+  }
+
+  getSpec() {
+    return this.spec;
+  }
+
+  toString() {
+    return (
+      "BoardData [name=" +
+      this.name +
+      ",fqbn=" +
+      this.fqbn.toString() +
+      ",pins=" +
+      this.pins.toString() +
+      "]"
+    );
   }
 }

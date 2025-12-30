@@ -1,4 +1,3 @@
-import { PinType } from "./BoardData.ts";
 import { isArray, isDefined, isObject } from "../utils/utils";
 
 export type BoardPin = {
@@ -6,7 +5,7 @@ export type BoardPin = {
   type: PinType;
 };
 
-export class PinLayout {
+export default class PinLayout {
   pins: BoardPin[];
 
   constructor(pins: BoardPin[]) {
@@ -42,4 +41,46 @@ export class PinLayout {
     let data = this.getByType(type);
     return data ? data.length : 0;
   }
+
+  toString() {
+    return "PinLayout [pins=" + this.pins.toString() + "]"
+  }
 }
+
+
+export class PinType {
+  static DIGITAL = new PinType("D", "digital");
+  static ANALOG = new PinType("A", "analog");
+  static PWM = new PinType(["~D"], "pwm");
+  static POWER = new PinType(
+    ["VIN", "GND", "GROUND", "3.3V", "3V3", "5V"],
+    "power"
+  );
+  static SERIAL = new PinType(["TX", "RX", "UART", "SPI", "I2C"], "power");
+
+  letters: string[];
+  name: string;
+  constructor(letter: string | string[], name: string) {
+    if (typeof letter === "string") {
+      letter = [letter];
+    }
+    this.letters = letter;
+    this.name = name;
+  }
+
+  static modes() {
+    return [this.DIGITAL, this.ANALOG, this.PWM, this.POWER];
+  }
+
+  static from(str: string): PinType | undefined {
+    str = str.toUpperCase();
+    for (const type of this.modes()) {
+      for (let i = 0; i < type.letters.length; i++) {
+        if (str.startsWith(type.letters[i])) {
+          return type;
+        }
+      }
+    }
+  }
+}
+
