@@ -5,7 +5,7 @@ export type BoardPin = {
   type: PinType;
 };
 
-export default class PinLayout {
+export class PinLayout {
   pins: BoardPin[];
 
   constructor(pins: BoardPin[]) {
@@ -16,7 +16,9 @@ export default class PinLayout {
   }
 
   static isValidPin(pin?: any): pin is BoardPin {
-    return isObject(pin) && typeof pin.id === "string" && pin.type instanceof PinType;
+    return (
+      isObject(pin) && typeof pin.id === "string" && pin.type instanceof PinType
+    );
   }
 
   getPins(): BoardPin[] {
@@ -42,12 +44,13 @@ export default class PinLayout {
     return data ? data.length : 0;
   }
 
-  toString() {
-    return "PinLayout [pins=" + this.pins.toString() + "]"
+  toString(): string {
+    return "PinLayout [pins=" + this.pins.toString() + "]";
   }
 }
+export default PinLayout;
 
-
+export type PinTypeNames = Exclude<keyof typeof PinType, "from" | "types" | "prototype">;
 export class PinType {
   static DIGITAL = new PinType("D", "digital");
   static ANALOG = new PinType("A", "analog");
@@ -56,31 +59,38 @@ export class PinType {
     ["VIN", "GND", "GROUND", "3.3V", "3V3", "5V"],
     "power"
   );
-  static SERIAL = new PinType(["TX", "RX", "UART", "SPI", "I2C"], "power");
+  static SERIAL = new PinType(["TX", "RX", "UART", "SPI", "I2C"], "serial");
 
-  letters: string[];
-  name: string;
+  #letters: string[];
+  #name: string;
   constructor(letter: string | string[], name: string) {
     if (typeof letter === "string") {
       letter = [letter];
     }
-    this.letters = letter;
-    this.name = name;
+    this.#letters = letter;
+    this.#name = name;
   }
 
-  static modes() {
-    return [this.DIGITAL, this.ANALOG, this.PWM, this.POWER];
+  getName(): string {
+    return this.#name;
   }
 
-  static from(str: string): PinType | undefined {
-    str = str.toUpperCase();
-    for (const type of this.modes()) {
-      for (let i = 0; i < type.letters.length; i++) {
-        if (str.startsWith(type.letters[i])) {
+  getLetters(): readonly string[] {
+    return this.#letters;
+  }
+
+  static types(): readonly PinType[] {
+    return [this.DIGITAL, this.ANALOG, this.PWM, this.POWER, this.SERIAL];
+  }
+
+  static from(name: PinTypeNames): PinType | undefined {
+    const str = name.toUpperCase();
+    for (const type of this.types()) {
+      for (let i = 0; i < type.getLetters().length; i++) {
+        if (str.startsWith(type.getLetters()[i])) {
           return type;
         }
       }
     }
   }
 }
-

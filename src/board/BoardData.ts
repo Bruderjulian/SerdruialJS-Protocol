@@ -10,7 +10,8 @@ export type BoardDataOptions = {
 };
 export type BoardSpec = {};
 
-export default class BoardData {
+
+export class BoardData {
   id: string;
   name: string;
   fqbn: FQBN;
@@ -37,7 +38,7 @@ export default class BoardData {
     this.spec = spec;
   }
 
-  static from(opts: BoardDataOptions) {
+  static from(opts: BoardDataOptions): BoardData {
     if (!isObject(opts)) {
       throw new TypeError("Invalid BoardData Object");
     }
@@ -49,35 +50,35 @@ export default class BoardData {
     );
   }
 
-  getId() {
+  getId(): string {
     return this.fqbn.boardId;
   }
 
-  getFQBN() {
+  getFQBN(): FQBN {
     return this.fqbn;
   }
 
-  getName() {
+  getName(): string {
     return this.name;
   }
 
-  getVendor() {
+  getVendor(): string {
     return this.fqbn.vendor;
   }
 
-  getArch() {
+  getArch(): string {
     return this.fqbn.arch;
   }
 
-  getPins() {
+  getPins(): PinLayout {
     return this.pins;
   }
 
-  getSpec() {
+  getSpec(): BoardSpec | undefined {
     return this.spec;
   }
 
-  toString() {
+  toString(): string {
     return (
       "BoardData [name=" +
       this.name +
@@ -89,3 +90,4 @@ export default class BoardData {
     );
   }
 }
+export default BoardData;

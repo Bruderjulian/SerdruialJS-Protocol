@@ -19,7 +19,7 @@ export class BoardRegistry {
     if (typeof id !== "string" || id.length === 0) {
       return;
     }
-    return this.boards[id.toLowerCase()];
+    return this.boards[id];
   }
 
   static getByName(name: string): BoardData | undefined {
@@ -33,14 +33,13 @@ export class BoardRegistry {
     if (typeof id !== "string" || id.length === 0) {
       return false;
     }
-    return hasOwn(this.boards, id.toLowerCase());
+    return hasOwn(this.boards, id);
   }
 
   static remove(id: string): void {
     if (typeof id !== "string" || id.length === 0) {
       return;
     }
-    id = id.toLowerCase();
     if (!hasOwn(this.boards, id)) {
       return;
     }
