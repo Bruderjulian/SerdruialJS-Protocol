@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The underlying Protocol for the SerdruialJS Project",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +16,9 @@
   "dependencies": {
     "binary-parser-encoder-bump": "^2.2.1",
     "polycrc": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "path-sage": "^1.6.0"
   }
 }
