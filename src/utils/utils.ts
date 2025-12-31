@@ -110,6 +110,10 @@ function isFunction(v: any): v is Function {
   return typeof v === "function";
 }
 
+function isNumber(n: any): n is number {
+  return typeof n === "number" && !isNaN(n)
+}
+
 function isDefined<T>(v?: T): v is NonNullable<T> {
   return typeof v !== "undefined" && v !== null;
 }
@@ -160,6 +164,7 @@ export {
   isObject,
   isDefined,
   isFunction,
+  isNumber,
   hasOwn,
   validBaudRate,
   validPort,
